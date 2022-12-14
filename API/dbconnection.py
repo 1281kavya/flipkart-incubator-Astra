@@ -1,25 +1,23 @@
+from mysql.connector import pooling
+from dotenv import load_dotenv
 import os
 
-from pymongo import MongoClient
-from pymongo.errors import ServerSelectionTimeoutError
+load_dotenv()
 
+def db_conn():
+    conn = pooling.MySQLConnectionPool(pool_name=os.getenv('pool_name'),
+                                                pool_size= int(os.getenv('pool_size')),
+                                                # pool_reset_session=os.getenv('reset_session'),
+                                                host=os.getenv('pool_host'),
+                                                database=os.getenv('pool_database'),
+                                                user=os.getenv('pool_user'),
+                                                password=os.getenv('pool_password'),
+                                                port=int(os.getenv('pool_port')),
+                                                auth_plugin=os.getenv("pool_auth_plugin"))  
 
-# Mongo DB connection
-def db_connect():
-    maxSevSelDelay = 1
-    try:
-        mongo_host = 'localhost'
-        mongo_port = 27017
+    conn_object = conn.get_connection()
 
-        if 'MONGO_PORT_27017_TCP_ADDR' in os.environ :
-            mongo_host = os.environ['MONGO_PORT_27017_TCP_ADDR']
+    return conn_object
+        
 
-        if 'MONGO_PORT_27017_TCP_PORT' in os.environ:
-            mongo_port = int(os.environ['MONGO_PORT_27017_TCP_PORT'])
-
-        client = MongoClient(mongo_host, mongo_port, serverSelectionTimeoutMS=maxSevSelDelay)
-        client.server_info()
-        return client
-
-    except ServerSelectionTimeoutError as err:
-        exit("Failed to connect to MongoDB.")
+db_conn()
