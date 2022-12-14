@@ -1,0 +1,7 @@
+requests
+logger
+pymongo
+ConfigParser
+pyjwt
+flask
+sqlmap
